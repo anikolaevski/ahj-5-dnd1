@@ -1,6 +1,9 @@
 /* eslint-disable no-plusplus */
 // import CardType from '/src/CardType.js';
 
+const Folder1 = document.querySelector('[data-id=Folder1]');
+const Folder2 = document.querySelector('[data-id=Folder2]');
+const Folder3 = document.querySelector('[data-id=Folder3]');
 const Col1_add = document.querySelector('[data-id=Col1_add]');
 const Col2_add = document.querySelector('[data-id=Col2_add]');
 const Col3_add = document.querySelector('[data-id=Col3_add]');
@@ -12,6 +15,9 @@ const Form_Data_Button = document.querySelector('[data-id=Form_Data_Button]');
 document.addEventListener('DOMContentLoaded', () => {
   // eslint-disable-next-line no-console
   console.log('Module started!');
+  LoadContent('Folder1', Folder1);
+  LoadContent('Folder2', Folder2);
+  LoadContent('Folder3', Folder3);
   Col1_add.addEventListener('click', addElement01);
   Col2_add.addEventListener('click', addElement01);
   Col3_add.addEventListener('click', addElement01);
@@ -43,6 +49,9 @@ function addElement02(evt) {
     div.addEventListener('click', OptDoRemove);
   }
   Item_Enter_Form.classList.add('invisible');
+  SaveContent('Folder1', Folder1);
+  SaveContent('Folder2', Folder2);
+  SaveContent('Folder3', Folder3);
 }
 
 function OptRemove(evt) {
@@ -77,5 +86,34 @@ function OptDoRemove(evt) {
   console.log(el);
   if (confirm(`Delete element${label}?`)) {
     el.parentElement.removeChild(el);
+    SaveContent('Folder1', Folder1);
+    SaveContent('Folder2', Folder2);
+    SaveContent('Folder3', Folder3);
   };
+}
+
+function SaveContent(name, el) {
+  let saveArr = [];
+  const arr = Array.prototype.slice.call(el.childNodes);
+  arr.forEach((o) => {
+    // console.log(o);
+    if (typeof(o.classList) != 'undefined') {
+      const classList = Array.prototype.slice.call(o.classList);
+      if (classList.includes('Subfolder-Item')) {
+        saveArr.push(JSON.stringify({item: o.innerHTML}));
+      }
+    }
+  });
+  localStorage.setItem(name, saveArr);
+}
+
+function LoadContent(name, el) {
+  const app = JSON.parse(`[${localStorage.getItem(name)}]`);
+  app.forEach((o) => {
+    const div = document.createElement('div');
+    div.innerHTML = o.item;
+    el.appendChild(div);
+    div.classList.add('Subfolder-Item');
+  });
+  console.log(name, app);
 }
