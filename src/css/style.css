@@ -40,6 +40,14 @@ body {
   cursor: inherit;
 }
 
+.Subfolder-Item.dragged {
+  border-radius: 10px;
+  position: absolute;
+  z-index: 999;
+  pointer-events: none;
+  background: #fff;
+}
+
 .Subfolder-Add-Control {
   position: absolute;
   font-size: 1.1em;

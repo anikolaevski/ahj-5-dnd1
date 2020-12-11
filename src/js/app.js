@@ -44,9 +44,7 @@ function addElement02(evt) {
     div.innerHTML = `<p>${text}</p>`;
     el.appendChild(div);
     div.classList.add('Subfolder-Item');
-    div.addEventListener('mouseover', OptRemove);
-    div.addEventListener('mouseout', EndOptRemove);
-    div.addEventListener('click', OptDoRemove);
+    setMouseEvents(div);
   }
   Item_Enter_Form.classList.add('invisible');
   SaveContent('Folder1', Folder1);
@@ -54,20 +52,57 @@ function addElement02(evt) {
   SaveContent('Folder3', Folder3);
 }
 
+function setMouseEvents(div) {
+    div.addEventListener('mouseover', OptRemove);     // ready for deletion
+    div.addEventListener('mouseout', EndOptRemove);   // mouse out element
+    div.addEventListener('click', OptDoRemove);       // Delete selected element by click
+    div.addEventListener('mousedown', OptMouseDown);  // Element Dragstart
+}
+
+function removeMouseEvents(div) {
+  
+}
+
+// ready for deletion
 function OptRemove(evt) {
+  evt.preventDefault();
   evt.target.style.cursor = 
   // "url('https://cdn4.iconfinder.com/data/icons/podcast-collection/100/close-512.png'), auto";
   'crosshair';
   // "url('img/delete_sign-512.png'), auto";
 }
 
-// mouse out topic element
+// mouse out element
 function EndOptRemove(evt) {
   evt.target.style.cursor = 'auto';
 }
 
-// Delete selected topic element by click
+// Element Dragstart
+function OptMouseDown(evt) {
+  evt.preventDefault();
+  const el = evt.target;
+  if (!el) {return;}
+  console.log('DnD', el);
+  ghostEl = el.cloneNode(true);
+  ghostEl.classList.add('dragged');
+  document.body.appendChild(ghostEl);
+  ghostEl.style.left = `${evt.pageX - ghostEl.offsetWidth / 2}px`;
+  ghostEl.style.top = `${evt.pageY - ghostEl.offsetHeight / 2}px`;
+  el.addEventListener('mousemove', OptMouseMove);  // Element drag
+}
+
+// Element drag
+function OptMouseMove (evt) {
+  evt.preventDefault();
+  const ghostEl = evt.target;
+  if (!ghostEl) {return;}
+  ghostEl.style.left = `${evt.pageX - ghostEl.offsetWidth / 2}px`;
+  ghostEl.style.top = `${evt.pageY - ghostEl.offsetHeight / 2}px`;
+}
+
+// Delete selected element by click
 function OptDoRemove(evt) {
+  evt.preventDefault();
   let el;
   console.log(evt.target.classList);
   if (evt.target.classList.contains('Subfolder-Item')) {
@@ -114,6 +149,7 @@ function LoadContent(name, el) {
     div.innerHTML = o.item;
     el.appendChild(div);
     div.classList.add('Subfolder-Item');
+    setMouseEvents(div);
   });
-  console.log(name, app);
+  // console.log(name, app);
 }
