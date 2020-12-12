@@ -10,7 +10,7 @@ const Col3_add = document.querySelector('[data-id=Col3_add]');
 const Item_Enter_Form = document.querySelector('[data-id=Item_Enter_Form]');
 const Form_Data_Title = document.querySelector('[data-id=Form_Data_Title]');
 const Form_Data_Button = document.querySelector('[data-id=Form_Data_Button]');
-
+let ghostEl = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   // eslint-disable-next-line no-console
@@ -53,14 +53,15 @@ function addElement02(evt) {
 }
 
 function setMouseEvents(div) {
-    div.addEventListener('mouseover', OptRemove);     // ready for deletion
-    div.addEventListener('mouseout', EndOptRemove);   // mouse out element
-    div.addEventListener('click', OptDoRemove);       // Delete selected element by click
+    // div.addEventListener('mouseover', OptRemove);     // ready for deletion
+    // div.addEventListener('mouseout', EndOptRemove);   // mouse out element
+    // div.addEventListener('click', OptDoRemove);       // Delete selected element by click
     div.addEventListener('mousedown', OptMouseDown);  // Element Dragstart
+    // div.addEventListener('mousemove', OptMouseMove);
 }
 
 function removeMouseEvents(div) {
-  
+
 }
 
 // ready for deletion
@@ -77,18 +78,20 @@ function EndOptRemove(evt) {
   evt.target.style.cursor = 'auto';
 }
 
-// Element Dragstart
+// Element Dragstart (mousedown)
 function OptMouseDown(evt) {
   evt.preventDefault();
   const el = evt.target;
-  if (!el) {return;}
+  if (!el.classList.contains('Subfolder-Item')) {
+    return;
+  }
   console.log('DnD', el);
   ghostEl = el.cloneNode(true);
   ghostEl.classList.add('dragged');
   document.body.appendChild(ghostEl);
   ghostEl.style.left = `${evt.pageX - ghostEl.offsetWidth / 2}px`;
   ghostEl.style.top = `${evt.pageY - ghostEl.offsetHeight / 2}px`;
-  el.addEventListener('mousemove', OptMouseMove);  // Element drag
+  ghostEl.addEventListener('mousemove', OptMouseMove);  // Element drag
 }
 
 // Element drag
