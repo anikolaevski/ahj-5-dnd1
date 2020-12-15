@@ -11,6 +11,7 @@ const Item_Enter_Form = document.querySelector('[data-id=Item_Enter_Form]');
 const Form_Data_Title = document.querySelector('[data-id=Form_Data_Title]');
 const Form_Data_Button = document.querySelector('[data-id=Form_Data_Button]');
 let ghostEl = null;
+let dragEl = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   // eslint-disable-next-line no-console
@@ -41,7 +42,7 @@ function addElement02(evt) {
   const text = Form_Data_Title.value;
   if (text) {
     const div = document.createElement('div');
-    div.innerHTML = `<p>${text}</p>`;
+    div.innerHTML = `<p class="Item-Content">${text}</p>`;
     el.appendChild(div);
     div.classList.add('Subfolder-Item');
     setMouseEvents(div);
@@ -53,9 +54,9 @@ function addElement02(evt) {
 }
 
 function setMouseEvents(div) {
-    // div.addEventListener('mouseover', OptRemove);     // ready for deletion
-    // div.addEventListener('mouseout', EndOptRemove);   // mouse out element
-    // div.addEventListener('click', OptDoRemove);       // Delete selected element by click
+    div.addEventListener('mouseover', OptRemove);     // ready for deletion
+    div.addEventListener('mouseout', EndOptRemove);   // mouse out element
+    div.addEventListener('click', OptDoRemove);       // Delete selected element by click
     div.addEventListener('mousedown', OptMouseDown);  // Element Dragstart
     // div.addEventListener('mousemove', OptMouseMove);
 }
@@ -81,17 +82,18 @@ function EndOptRemove(evt) {
 // Element Dragstart (mousedown)
 function OptMouseDown(evt) {
   evt.preventDefault();
-  const el = evt.target;
-  if (!el.classList.contains('Subfolder-Item')) {
+  if (!evt.target.classList.contains('Subfolder-Item')) {
     return;
   }
-  console.log('DnD', el);
-  ghostEl = el.cloneNode(true);
+  dragEl = evt.target;
+  console.log('DnD', dragEl);
+  ghostEl = dragEl.cloneNode(true);
   ghostEl.classList.add('dragged');
   document.body.appendChild(ghostEl);
   ghostEl.style.left = `${evt.pageX - ghostEl.offsetWidth / 2}px`;
   ghostEl.style.top = `${evt.pageY - ghostEl.offsetHeight / 2}px`;
   ghostEl.addEventListener('mousemove', OptMouseMove);  // Element drag
+  ghostEl.addEventListener('mouseup', OptDragEnd);  // Element drag
 }
 
 // Element drag
@@ -101,6 +103,27 @@ function OptMouseMove (evt) {
   if (!ghostEl) {return;}
   ghostEl.style.left = `${evt.pageX - ghostEl.offsetWidth / 2}px`;
   ghostEl.style.top = `${evt.pageY - ghostEl.offsetHeight / 2}px`;
+}
+
+// Element drag end
+function OptDragEnd(evt) {
+  if (!dragEl) {
+    return;
+  }
+  // const closest = document.elementFromPoint(evt.clientX, evt.clientY);
+  const ar = document.elementsFromPoint(evt.clientX, evt.clientY);
+  const closest = ar.find((o) => {
+    return o.nodeName.toUpperCase() == 'DIV' && o.classList.contains('Subfolder-Item') && !o.classList.contains('dragged')
+  });
+  if (closest) {
+    const parent = closest.parentElement;
+    parent.insertBefore(dragEl, closest);
+    document.body.removeChild(ghostEl);
+    ghostEl = null;
+    dragEl = null;
+  }
+
+  // save state here
 }
 
 // Delete selected element by click
@@ -148,11 +171,13 @@ function SaveContent(name, el) {
 function LoadContent(name, el) {
   const app = JSON.parse(`[${localStorage.getItem(name)}]`);
   app.forEach((o) => {
-    const div = document.createElement('div');
-    div.innerHTML = o.item;
-    el.appendChild(div);
-    div.classList.add('Subfolder-Item');
-    setMouseEvents(div);
+    if (o && Object.keys(o).includes('item')) {
+      const div = document.createElement('div');
+      div.innerHTML = o.item;
+      el.appendChild(div);
+      div.classList.add('Subfolder-Item');
+      setMouseEvents(div);
+    }
   });
   // console.log(name, app);
 }
