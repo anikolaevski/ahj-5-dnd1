@@ -7,11 +7,13 @@ const Folder3 = document.querySelector('[data-id=Folder3]');
 const Col1_add = document.querySelector('[data-id=Col1_add]');
 const Col2_add = document.querySelector('[data-id=Col2_add]');
 const Col3_add = document.querySelector('[data-id=Col3_add]');
-const Item_Enter_Form = document.querySelector('[data-id=Item_Enter_Form]');
-const Form_Data_Title = document.querySelector('[data-id=Form_Data_Title]');
-const Form_Data_Button = document.querySelector('[data-id=Form_Data_Button]');
-let ghostEl = null;
-let dragEl = null;
+
+const dndObj = {
+  ghostEl: null,
+  dragEl: null,
+  keepReserveEl: document.createElement('div'),
+  keepReserveParent: null,
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   // eslint-disable-next-line no-console
@@ -22,13 +24,16 @@ document.addEventListener('DOMContentLoaded', () => {
   Col1_add.addEventListener('click', addElement01);
   Col2_add.addEventListener('click', addElement01);
   Col3_add.addEventListener('click', addElement01);
-  Form_Data_Button.addEventListener('click', addElement02);
 });
 
 // Requesting topic
 function addElement01 (evt) {
   const el = evt.target.parentNode;
   if (el) {
+    const Item_Enter_Form = document.querySelector('[data-id=Item_Enter_Form]');
+    const Form_Data_Title = document.querySelector('[data-id=Form_Data_Title]');
+    const Form_Data_Button = document.querySelector('[data-id=Form_Data_Button]');
+    Form_Data_Button.addEventListener('click', addElement02);
     Item_Enter_Form.classList.remove('invisible');
     el.appendChild(Item_Enter_Form);
     Form_Data_Title.value = '';
@@ -38,6 +43,8 @@ function addElement01 (evt) {
 // Adding topic element
 function addElement02(evt) {
   evt.preventDefault();
+  const Item_Enter_Form = document.querySelector('[data-id=Item_Enter_Form]');
+  const Form_Data_Title = document.querySelector('[data-id=Form_Data_Title]');
   const el = Item_Enter_Form.parentNode;
   const text = Form_Data_Title.value;
   if (text) {
@@ -85,52 +92,88 @@ function OptMouseDown(evt) {
   if (!evt.target.classList.contains('Subfolder-Item')) {
     return;
   }
-  dragEl = evt.target;
-  console.log('DnD', dragEl);
-  ghostEl = dragEl.cloneNode(true);
-  ghostEl.classList.add('dragged');
-  document.body.appendChild(ghostEl);
-  ghostEl.style.left = `${evt.pageX - ghostEl.offsetWidth / 2}px`;
-  ghostEl.style.top = `${evt.pageY - ghostEl.offsetHeight / 2}px`;
-  ghostEl.addEventListener('mousemove', OptMouseMove);  // Element drag
-  ghostEl.addEventListener('mouseup', OptDragEnd);  // Element drag
+  dndObj.dragEl = evt.target;
+  // console.log('DnD', dndObj.dragEl);
+  dndObj.ghostEl = dndObj.dragEl.cloneNode(true);
+  dndObj.ghostEl.classList.add('dragged');
+  document.body.appendChild(dndObj.ghostEl);
+  dndObj.ghostEl.style.left = `${evt.pageX - dndObj.ghostEl.offsetWidth / 2}px`;
+  dndObj.ghostEl.style.top = `${evt.pageY - dndObj.ghostEl.offsetHeight / 2}px`;
+  dndObj.ghostEl.addEventListener('mousemove', OptMouseMove);  // Element drag
+  dndObj.ghostEl.addEventListener('mouseup', OptDragEnd);  // Element drag
 }
 
 // Element drag
 function OptMouseMove (evt) {
   evt.preventDefault();
-  const ghostEl = evt.target;
-  if (!ghostEl) {return;}
-  ghostEl.style.left = `${evt.pageX - ghostEl.offsetWidth / 2}px`;
-  ghostEl.style.top = `${evt.pageY - ghostEl.offsetHeight / 2}px`;
-}
-
-// Element drag end
-function OptDragEnd(evt) {
-  if (!dragEl) {
-    return;
-  }
-  // const closest = document.elementFromPoint(evt.clientX, evt.clientY);
+  dndObj.ghostEl = evt.target;
+  if (!dndObj.ghostEl) {return;}
+  dndObj.ghostEl.style.left = `${evt.pageX - dndObj.ghostEl.offsetWidth / 2}px`;
+  dndObj.ghostEl.style.top = `${evt.pageY - dndObj.ghostEl.offsetHeight / 2}px`;
   const ar = document.elementsFromPoint(evt.clientX, evt.clientY);
   const closest = ar.find((o) => {
     return o.nodeName.toUpperCase() == 'DIV' && o.classList.contains('Subfolder-Item') && !o.classList.contains('dragged')
   });
+  dndObj.keepReserveParent = ar.find((o) => {
+    return o.nodeName.toUpperCase() == 'DIV' && o.classList.contains('Subfolder') && !o.classList.contains('dragged')
+  });
   if (closest) {
     const parent = closest.parentElement;
-    parent.insertBefore(dragEl, closest);
-    document.body.removeChild(ghostEl);
-    ghostEl = null;
-    dragEl = null;
+    parent.insertBefore(dndObj.keepReserveEl, closest);
+    dndObj.keepReserveEl.style.width = `${dndObj.ghostEl.offsetWidth}px`;
+    dndObj.keepReserveEl.style.height = `${dndObj.ghostEl.offsetHeight}px`;
+    div.classList.add('Subfolder-Item');
+  } else if (dndObj.keepReserveParent && dndObj.keepReserveEl) {
+    dndObj.keepReserveParent.appendChild(dndObj.keepReserveEl);
+    dndObj.keepReserveEl.style.width = `${dndObj.ghostEl.offsetWidth}px`;
+    dndObj.keepReserveEl.style.height = `${dndObj.ghostEl.offsetHeight}px`;
+    div.classList.add('Subfolder-Item');
+  }
+}
+
+// Element drag end
+function OptDragEnd(evt) {
+  if (!dndObj.dragEl) {
+    return;
   }
 
+  if (dndObj.keepReserveEl) {
+    const parent = dndObj.keepReserveEl.parentElement;
+    parent.insertBefore(dndObj.dragEl, dndObj.keepReserveEl);
+  } else if (dndObj.keepReserveParent) {
+    dndObj.keepReserveParent.appendChild(dndObj.dragEl);
+  }
+
+  let criteria = true;
+  while (criteria) {
+    const toDel = document.querySelector(".dragged");
+    if (toDel) {
+      const parentel = toDel.parentNode;
+      parentel.removeChild(toDel);
+    } else {
+      criteria = false;
+    }
+  }
+
+  if (dndObj.keepReserveEl) {
+    const parentel = dndObj.keepReserveEl.parentNode;
+    parentel.removeChild(dndObj.keepReserveEl);
+  }
+
+  dndObj.ghostEl = null;
+  dndObj.dragEl = null;
+
   // save state here
+  SaveContent('Folder1', Folder1);
+  SaveContent('Folder2', Folder2);
+  SaveContent('Folder3', Folder3);
 }
 
 // Delete selected element by click
 function OptDoRemove(evt) {
   evt.preventDefault();
   let el;
-  console.log(evt.target.classList);
+  // console.log(evt.target.classList);
   if (evt.target.classList.contains('Subfolder-Item')) {
     el = evt.target;
   } else {
@@ -144,7 +187,7 @@ function OptDoRemove(evt) {
     label = ` "${p.innerText}"`
   }
   
-  console.log(el);
+  // console.log(el);
   if (confirm(`Delete element${label}?`)) {
     el.parentElement.removeChild(el);
     SaveContent('Folder1', Folder1);
