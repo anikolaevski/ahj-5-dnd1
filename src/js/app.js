@@ -75,14 +75,22 @@ function removeMouseEvents(div) {
 // ready for deletion
 function OptRemove(evt) {
   // evt.preventDefault();
+  let el;
   if(evt.target.classList.contains('Subfolder-Item')) {
-    const div = document.createElement('div');
-    evt.target.appendChild(div);
-    div.classList.add('delete-box');
-    div.style.top = `${evt.target.offsetTop + 10}px`;
-    console.log(div);
+    el = evt.target;
   } else {
-    console.log(evt.target.nodeName);
+    el = evt.target.parentElement;
+  }
+
+  const div = document.createElement('div');
+  el.appendChild(div);
+  div.classList.add('delete-box');
+  div.style.top = `${el.offsetTop + 10}px`;
+
+  div.addEventListener('click', OptDoRemove);
+  // console.log(div);
+  // } else {
+  //   console.log(evt.target.nodeName);
   }
 }
 
