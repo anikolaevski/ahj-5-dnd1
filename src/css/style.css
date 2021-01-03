@@ -88,4 +88,19 @@ body {
   color: #0c0;
 }
 
+.delete-box {
+  background-image: url("../img/delete_sign-512.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  box-sizing: border-box;
+  background-position: center;
+  background-color: gray;
+  width: 1.5rem;
+  height: 1.5rem;
+  position: absolute;
+  /* top: 0.5rem; */
+  right: 0.5rem;
+  z-index: 999;
+}
+
 

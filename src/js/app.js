@@ -63,7 +63,7 @@ function addElement02(evt) {
 function setMouseEvents(div) {
     div.addEventListener('mouseover', OptRemove);     // ready for deletion
     div.addEventListener('mouseout', EndOptRemove);   // mouse out element
-    div.addEventListener('click', OptDoRemove);       // Delete selected element by click
+    // div.addEventListener('click', OptDoRemove);       // Delete selected element by click
     div.addEventListener('mousedown', OptMouseDown);  // Element Dragstart
     // div.addEventListener('mousemove', OptMouseMove);
 }
@@ -74,16 +74,24 @@ function removeMouseEvents(div) {
 
 // ready for deletion
 function OptRemove(evt) {
-  evt.preventDefault();
-  evt.target.style.cursor = 
-  // "url('https://cdn4.iconfinder.com/data/icons/podcast-collection/100/close-512.png'), auto";
-  'crosshair';
-  // "url('img/delete_sign-512.png'), auto";
+  // evt.preventDefault();
+  if(evt.target.classList.contains('Subfolder-Item')) {
+    const div = document.createElement('div');
+    evt.target.appendChild(div);
+    div.classList.add('delete-box');
+    div.style.top = `${evt.target.offsetTop + 10}px`;
+    console.log(div);
+  } else {
+    console.log(evt.target.nodeName);
+  }
 }
 
 // mouse out element
 function EndOptRemove(evt) {
-  evt.target.style.cursor = 'auto';
+  const delbox = evt.target.querySelector('.delete-box');
+  if (delbox) {
+    evt.target.removeChild(delbox);
+  }
 }
 
 // Element Dragstart (mousedown)
@@ -120,14 +128,14 @@ function OptMouseMove (evt) {
   if (closest) {
     const parent = closest.parentElement;
     parent.insertBefore(dndObj.keepReserveEl, closest);
-    dndObj.keepReserveEl.style.width = `${dndObj.ghostEl.offsetWidth}px`;
-    dndObj.keepReserveEl.style.height = `${dndObj.ghostEl.offsetHeight}px`;
-    div.classList.add('Subfolder-Item');
+    dndObj.keepReserveEl.style.width = `${dndObj.dragEl.offsetWidth}px`;
+    dndObj.keepReserveEl.style.height = `${dndObj.dragEl.offsetHeight}px`;
+    // dndObj.keepReserveEl.classList.add('Subfolder-Item');
   } else if (dndObj.keepReserveParent && dndObj.keepReserveEl) {
     dndObj.keepReserveParent.appendChild(dndObj.keepReserveEl);
-    dndObj.keepReserveEl.style.width = `${dndObj.ghostEl.offsetWidth}px`;
-    dndObj.keepReserveEl.style.height = `${dndObj.ghostEl.offsetHeight}px`;
-    div.classList.add('Subfolder-Item');
+    dndObj.keepReserveEl.style.width = `${dndObj.dragEl.offsetWidth}px`;
+    dndObj.keepReserveEl.style.height = `${dndObj.dragEl.offsetHeight}px`;
+    // dndObj.keepReserveEl.classList.add('Subfolder-Item');
   }
 }
 
