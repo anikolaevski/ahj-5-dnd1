@@ -91,14 +91,15 @@ function OptRemove(evt) {
   // console.log(div);
   // } else {
   //   console.log(evt.target.nodeName);
-  }
+  // }
 }
 
 // mouse out element
 function EndOptRemove(evt) {
-  const delbox = evt.target.querySelector('.delete-box');
-  if (delbox) {
+  let delbox = evt.target.querySelector('.delete-box');
+  while (delbox) {
     evt.target.removeChild(delbox);
+    delbox = evt.target.querySelector('.delete-box');
   }
 }
 
@@ -106,15 +107,32 @@ function EndOptRemove(evt) {
 function OptMouseDown(evt) {
   evt.preventDefault();
   if (!evt.target.classList.contains('Subfolder-Item')) {
+    if (!evt.target.classList.contains('delete-box')) {
+      dndObj.pageX = evt.pageX;
+      dndObj.pageY = evt.pageY;
+      // console.log(evt.target,evt.pageX,evt.pageY);
+      evt.target.parentNode.dispatchEvent(new Event('mousedown'));      
+    } 
+    else {
+      evt.target.dispatchEvent(new Event('click'));
+    }
     return;
   }
+  if (evt.pageX) {dndObj.pageX = evt.pageX};
+  if (evt.pageY) {dndObj.pageY = evt.pageY};
+  console.log(evt.target,evt.pageX,evt.pageY);
   dndObj.dragEl = evt.target;
   // console.log('DnD', dndObj.dragEl);
   dndObj.ghostEl = dndObj.dragEl.cloneNode(true);
   dndObj.ghostEl.classList.add('dragged');
+  let toDel = dndObj.ghostEl.querySelector(".delete-box");
+  while (toDel) {
+    dndObj.ghostEl.removeChild(toDel);
+    toDel = dndObj.ghostEl.querySelector(".delete-box");
+  }
   document.body.appendChild(dndObj.ghostEl);
-  dndObj.ghostEl.style.left = `${evt.pageX - dndObj.ghostEl.offsetWidth / 2}px`;
-  dndObj.ghostEl.style.top = `${evt.pageY - dndObj.ghostEl.offsetHeight / 2}px`;
+  dndObj.ghostEl.style.left = `${dndObj.pageX - dndObj.ghostEl.offsetWidth / 2}px`;
+  dndObj.ghostEl.style.top = `${dndObj.pageY - dndObj.ghostEl.offsetHeight / 2}px`;
   dndObj.ghostEl.addEventListener('mousemove', OptMouseMove);  // Element drag
   dndObj.ghostEl.addEventListener('mouseup', OptDragEnd);  // Element drag
 }
