@@ -15,6 +15,19 @@ const dndObj = {
   keepReserveParent: null,
 };
 
+function removeDel() {
+  let criteria = true;
+  while (criteria) {
+    const toDel = document.querySelector('.dragged');
+    if (toDel) {
+      const parentel = toDel.parentNode;
+      parentel.removeChild(toDel);
+    } else {
+      criteria = false;
+    }
+  }
+}
+
 function SaveContent(name, el) {
   removeDel();
   const saveArr = [];
@@ -111,19 +124,6 @@ function OptMouseMove(evt) {
   }
 }
 
-function removeDel() {
-    let criteria = true;
-  while (criteria) {
-    const toDel = document.querySelector('.dragged');
-    if (toDel) {
-      const parentel = toDel.parentNode;
-      parentel.removeChild(toDel);
-    } else {
-      criteria = false;
-    }
-  }
-}
-
 // Element drag end
 function OptDragEnd() {
   if (!dndObj.dragEl) {
@@ -137,8 +137,6 @@ function OptDragEnd() {
   } else if (dndObj.keepReserveParent) {
     dndObj.keepReserveParent.appendChild(dndObj.dragEl);
   }
-
-
 
   if (dndObj.keepReserveEl) {
     const parentel = dndObj.keepReserveEl.parentNode;
