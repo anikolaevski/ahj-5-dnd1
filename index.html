@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="css/style.css">
+<link rel="shortcut icon" href="favicon.ico"><link href="main.css" rel="stylesheet"></head>
+<body>
+  <h1></h1>
+  <div id="MainFolder" class="MainFolder">
+    <div data-id="Folder1" class="Subfolder">
+      <h2 class="Subfolder-Header">TODO</h2>
+      <a data-id="Col1_add" class="Subfolder-Add-Control">+ Add another card</a>
+    </div>
+    <div data-id="Folder2" class="Subfolder">
+      <h2 class="Subfolder-Header">IN PROGRESS</h2>
+      <a data-id="Col2_add" class="Subfolder-Add-Control">+ Add another card</a>
+    </div>
+    <div data-id="Folder3" class="Subfolder">
+      <h2 class="Subfolder-Header">DONE</h2>
+      <a data-id="Col3_add" class="Subfolder-Add-Control">+ Add another card</a>
+    </div>
+  </div>
+<script type="text/javascript" src="main.js"></script></body>
+<div data-id="Item_Enter_Form" class="Item_Enter_Form invisible">
+  <form>
+    <textarea data-id="Form_Data_Title" class="Form_Data_Title" placeholder="Enter a title for this card"></textarea>
+    <button data-id="Form_Data_Button" class="Form_Data_Button">Add card</button>
+  </form>
+</div>
+<script src="js/app.js"></script>
+</html>
