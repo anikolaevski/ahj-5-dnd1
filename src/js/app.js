@@ -16,6 +16,7 @@ const dndObj = {
 };
 
 function SaveContent(name, el) {
+  removeDel();
   const saveArr = [];
   const arr = Array.prototype.slice.call(el.childNodes);
   arr.forEach((o) => {
@@ -110,20 +111,8 @@ function OptMouseMove(evt) {
   }
 }
 
-// Element drag end
-function OptDragEnd() {
-  if (!dndObj.dragEl) {
-    return;
-  }
-
-  if (dndObj.keepReserveEl) {
-    const parent = dndObj.keepReserveEl.parentElement;
-    parent.insertBefore(dndObj.dragEl, dndObj.keepReserveEl);
-  } else if (dndObj.keepReserveParent) {
-    dndObj.keepReserveParent.appendChild(dndObj.dragEl);
-  }
-
-  let criteria = true;
+function removeDel() {
+    let criteria = true;
   while (criteria) {
     const toDel = document.querySelector('.dragged');
     if (toDel) {
@@ -133,6 +122,23 @@ function OptDragEnd() {
       criteria = false;
     }
   }
+}
+
+// Element drag end
+function OptDragEnd() {
+  if (!dndObj.dragEl) {
+    return;
+  }
+  removeDel();
+
+  if (dndObj.keepReserveEl) {
+    const parent = dndObj.keepReserveEl.parentElement;
+    parent.insertBefore(dndObj.dragEl, dndObj.keepReserveEl);
+  } else if (dndObj.keepReserveParent) {
+    dndObj.keepReserveParent.appendChild(dndObj.dragEl);
+  }
+
+
 
   if (dndObj.keepReserveEl) {
     const parentel = dndObj.keepReserveEl.parentNode;
